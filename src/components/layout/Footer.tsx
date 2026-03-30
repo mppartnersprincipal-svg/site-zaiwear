@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Camera, MessageCircle, Mail } from 'lucide-react'
+import { Camera, Mail } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { useCategories } from '@/hooks/useCategories'
 
@@ -10,124 +10,168 @@ export function Footer() {
 
   return (
     <footer style={{ backgroundColor: 'var(--color-charcoal)' }} className="text-white">
-      <div className="container-custom py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-          {/* Brand */}
-          <div className="lg:col-span-1">
-            <Link to="/" className="inline-block mb-4">
-              <span className="font-display text-2xl font-bold">
-                Zai<span style={{ color: 'hsl(220 52% 65%)' }}>Wear</span>
-              </span>
-            </Link>
-            <p className="text-sm text-gray-400 leading-relaxed mb-6">
-              Moda Plus Size com estilo, conforto e qualidade para todos os tamanhos.
-            </p>
-            <div className="flex items-center gap-3">
-              <a
-                href={`https://wa.me/${WHATSAPP_NUMBER}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-                aria-label="WhatsApp"
-              >
-                <WhatsAppIcon className="w-4 h-4" />
-              </a>
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-                aria-label="Camera"
-              >
-                <Camera size={16} />
-              </a>
-            </div>
+
+      {/* ── Main footer ── */}
+      <div className="container-custom py-14 md:py-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
+
+          {/* Col 1 — General */}
+          <div>
+            <h5 className="text-[10px] font-bold tracking-[0.12em] uppercase text-white/40 mb-4">
+              Geral
+            </h5>
+            <ul className="flex flex-col gap-2.5">
+              {[
+                { label: 'Sobre Nós',     href: '#' },
+                { label: 'Blog',          href: '#' },
+                { label: 'Como Funciona', href: '#' },
+                { label: 'Contato',       href: `https://wa.me/${WHATSAPP_NUMBER}` },
+              ].map(({ label, href }) => (
+                <li key={label}>
+                  <a
+                    href={href}
+                    target={href.startsWith('http') ? '_blank' : undefined}
+                    rel="noopener noreferrer"
+                    className="text-[13px] text-white/50 hover:text-white transition-colors"
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {/* Products */}
+          {/* Col 2 — Products */}
           <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 text-gray-300">Produtos</h4>
-            <ul className="flex flex-col gap-2">
-              {categories.slice(0, 6).map(cat => (
+            <h5 className="text-[10px] font-bold tracking-[0.12em] uppercase text-white/40 mb-4">
+              Produtos
+            </h5>
+            <ul className="flex flex-col gap-2.5">
+              {categories.slice(0, 5).map(cat => (
                 <li key={cat.id}>
                   <Link
                     to={`/categoria/${cat.slug}`}
-                    className="text-sm text-gray-400 hover:text-white transition-colors"
+                    className="text-[13px] text-white/50 hover:text-white transition-colors"
                   >
                     {cat.name}
                   </Link>
                 </li>
               ))}
               <li>
-                <Link to="/categorias" className="text-sm text-gray-400 hover:text-white transition-colors">
-                  Ver todas as categorias
+                <Link
+                  to="/categorias"
+                  className="text-[13px] text-white/50 hover:text-white transition-colors"
+                >
+                  Ver tudo
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Customer Service */}
+          {/* Col 3 — Customer Service */}
           <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 text-gray-300">Atendimento</h4>
-            <ul className="flex flex-col gap-2">
-              <li>
-                <a
-                  href={`https://wa.me/${WHATSAPP_NUMBER}?text=Olá! Preciso de ajuda.`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-gray-400 hover:text-white transition-colors"
-                >
-                  WhatsApp
-                </a>
-              </li>
-              <li>
-                <span className="text-sm text-gray-400">Como Comprar</span>
-              </li>
-              <li>
-                <span className="text-sm text-gray-400">Trocas e Devoluções</span>
-              </li>
-              <li>
-                <span className="text-sm text-gray-400">Tabela de Medidas</span>
-              </li>
+            <h5 className="text-[10px] font-bold tracking-[0.12em] uppercase text-white/40 mb-4">
+              Atendimento
+            </h5>
+            <ul className="flex flex-col gap-2.5">
+              {[
+                { label: 'FAQ',                href: '#' },
+                { label: 'Ajuda & Suporte',    href: `https://wa.me/${WHATSAPP_NUMBER}` },
+                { label: 'Trocas e Devoluções',href: '#' },
+                { label: 'Tabela de Medidas',  href: '#' },
+              ].map(({ label, href }) => (
+                <li key={label}>
+                  <a
+                    href={href}
+                    target={href.startsWith('http') ? '_blank' : undefined}
+                    rel="noopener noreferrer"
+                    className="text-[13px] text-white/50 hover:text-white transition-colors"
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Col 4 — Social */}
           <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 text-gray-300">Contato</h4>
-            <ul className="flex flex-col gap-3">
-              <li className="flex items-center gap-2 text-sm text-gray-400">
-                <MessageCircle size={15} className="shrink-0" />
-                <a
-                  href={`https://wa.me/${WHATSAPP_NUMBER}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white transition-colors"
-                >
-                  +55 62 99940-4998
-                </a>
-              </li>
-              <li className="flex items-center gap-2 text-sm text-gray-400">
-                <Camera size={15} className="shrink-0" />
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-                  @zaiwear
-                </a>
-              </li>
-              <li className="flex items-center gap-2 text-sm text-gray-400">
-                <Mail size={15} className="shrink-0" />
-                <span>contato@zaiwear.com</span>
-              </li>
+            <h5 className="text-[10px] font-bold tracking-[0.12em] uppercase text-white/40 mb-4">
+              Redes Sociais
+            </h5>
+            <ul className="flex flex-col gap-2.5">
+              {[
+                { label: 'Instagram', href: 'https://instagram.com/zaiwear' },
+                { label: 'TikTok',    href: '#' },
+                { label: 'Facebook',  href: '#' },
+                { label: 'YouTube',   href: '#' },
+              ].map(({ label, href }) => (
+                <li key={label}>
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[13px] text-white/50 hover:text-white transition-colors"
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
+      </div>
 
-        <div className="border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-gray-500">
+      {/* ── Bottom bar ── */}
+      <div className="border-t border-white/8">
+        <div className="container-custom py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+
+          {/* Brand */}
+          <Link to="/" className="shrink-0">
+            <span className="font-display text-xl font-bold tracking-tight">
+              Zai<span style={{ color: 'var(--color-accent)' }}>Wear</span>
+            </span>
+          </Link>
+
+          <p className="text-[11px] text-white/30 order-last sm:order-none">
             © {new Date().getFullYear()} ZaiWear — Globo Confecções. Todos os direitos reservados.
           </p>
-          <Link to="/admin/login" className="text-xs text-gray-700 hover:text-gray-500 transition-colors">
-            ADM
-          </Link>
+
+          {/* Social icons */}
+          <div className="flex items-center gap-2">
+            <a
+              href={`https://wa.me/${WHATSAPP_NUMBER}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-white/8 hover:bg-white/15 transition-colors"
+              aria-label="WhatsApp"
+            >
+              <WhatsAppIcon className="w-3.5 h-3.5" />
+            </a>
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-white/8 hover:bg-white/15 transition-colors"
+              aria-label="Instagram"
+            >
+              <Camera size={14} />
+            </a>
+            <a
+              href="mailto:contato@zaiwear.com"
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-white/8 hover:bg-white/15 transition-colors"
+              aria-label="Email"
+            >
+              <Mail size={14} />
+            </a>
+            <Link
+              to="/admin/login"
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-white/8 hover:bg-white/15 transition-colors text-[10px] font-bold text-white/30 hover:text-white/60"
+              aria-label="Admin"
+            >
+              ADM
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

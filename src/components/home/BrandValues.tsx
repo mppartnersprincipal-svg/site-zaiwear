@@ -19,28 +19,34 @@ const values = [
   {
     icon: MessageCircle,
     title: 'Atendimento',
-    description: 'Suporte dedicado via WhatsApp para tirar todas as suas dúvidas.',
+    description: 'Suporte via WhatsApp para tirar todas as suas dúvidas.',
   },
 ]
 
 export function BrandValues() {
   return (
-    <section className="py-12 bg-muted/50">
+    <section className="py-10 border-b border-border bg-white">
       <div className="container-custom">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-border rounded-2xl overflow-hidden shadow-sm">
           {values.map(({ icon: Icon, title, description }) => (
             <div
               key={title}
-              className="flex flex-col items-center text-center gap-3 p-6 bg-white rounded-xl border border-border hover:shadow-md transition-shadow"
+              className="flex flex-col sm:flex-row items-center sm:items-start gap-3 p-5 md:p-6 bg-white hover:bg-muted/40 transition-colors"
             >
               <div
-                className="flex items-center justify-center w-12 h-12 rounded-full"
-                style={{ backgroundColor: 'hsl(220 52% 42% / 0.1)' }}
+                className="flex items-center justify-center w-10 h-10 rounded-full shrink-0"
+                style={{ backgroundColor: 'hsl(33 42% 58% / 0.12)' }}
               >
-                <Icon size={22} style={{ color: 'var(--color-primary)' }} />
+                <Icon size={18} style={{ color: 'var(--color-accent)' }} />
               </div>
-              <h3 className="font-display text-sm font-semibold text-foreground">{title}</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>
+              <div className="text-center sm:text-left">
+                <h3 className="font-sans text-[13px] font-700 text-foreground leading-snug font-semibold">
+                  {title}
+                </h3>
+                <p className="text-[12px] text-muted-foreground leading-relaxed mt-0.5 hidden md:block">
+                  {description}
+                </p>
+              </div>
             </div>
           ))}
         </div>
