@@ -3,6 +3,8 @@ import { X, Check } from 'lucide-react'
 import { useCart } from '@/contexts/CartContext'
 import { formatPrice } from '@/lib/utils'
 import type { Product, ProductColor, ProductSize } from '@/types/product'
+import { SIZE_CHARTS } from '@/data/sizeCharts'
+import { SizeChartModal } from './SizeChartModal'
 
 interface Props {
   product: Product
@@ -25,6 +27,9 @@ export function ProductCard({ product }: Props) {
   const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null)
   const [zoomOpen, setZoomOpen] = useState(false)
   const [added, setAdded] = useState(false)
+  const [chartOpen, setChartOpen] = useState(false)
+
+  const sizeChart = SIZE_CHARTS[product.id] ?? null
 
   const currentImage = selectedColor?.image ?? product.image
   const currentPrice = selectedSize?.price ?? (sizes[0]?.price ?? 0)
@@ -144,19 +149,36 @@ export function ProductCard({ product }: Props) {
 
           {/* Sizes */}
           {sizes.length > 0 && (
-            <div className="grid grid-cols-4 gap-1">
-              {sizes.map(size => (
-                <button
-                  key={size.id}
-                  onClick={() => size.available ? setSelectedSize(size) : undefined}
-                  disabled={!size.available}
-                  className={`badge-size touch-manipulation ${
-                    selectedSize?.id === size.id ? 'badge-size-active' : ''
-                  } ${!size.available ? 'opacity-25 cursor-not-allowed line-through' : ''}`}
-                >
-                  {size.size}
-                </button>
-              ))}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <span className="font-body text-[10px] text-[#444650]/70 uppercase tracking-wide">Tamanho:</span>
+                {sizeChart && (
+                  <button
+                    onClick={() => setChartOpen(true)}
+                    className="flex items-center gap-1 font-body text-[10px] text-[#1d4ed8] hover:underline"
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>straighten</span>
+                    Tabela de medidas
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-4 gap-1">
+                {sizes.map(size => (
+                  <button
+                    key={size.id}
+                    onClick={() => size.available ? setSelectedSize(size) : undefined}
+                    disabled={!size.available}
+                    className={`badge-size touch-manipulation ${
+                      selectedSize?.id === size.id ? 'badge-size-active' : ''
+                    } ${!size.available ? 'opacity-25 cursor-not-allowed line-through' : ''}`}
+                  >
+                    {size.size}
+                  </button>
+                ))}
+              </div>
+              <p className="text-[9px] font-body text-[#a43c12] font-semibold text-center leading-snug pt-0.5">
+                ⚡ Clique no tamanho e confira o valor do tamanho selecionado
+              </p>
             </div>
           )}
 
@@ -186,6 +208,11 @@ export function ProductCard({ product }: Props) {
           </button>
         </div>
       </article>
+
+      {/* Size Chart Modal */}
+      {chartOpen && sizeChart && (
+        <SizeChartModal chart={sizeChart} onClose={() => setChartOpen(false)} />
+      )}
 
       {/* Zoom Modal */}
       {zoomOpen && (
