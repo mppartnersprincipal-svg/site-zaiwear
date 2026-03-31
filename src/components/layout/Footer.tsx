@@ -1,6 +1,4 @@
 import { Link } from 'react-router-dom'
-import { Camera, Mail } from 'lucide-react'
-import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { useCategories } from '@/hooks/useCategories'
 
 const WHATSAPP_NUMBER = '5562999404998'
@@ -9,169 +7,79 @@ export function Footer() {
   const { data: categories = [] } = useCategories()
 
   return (
-    <footer style={{ backgroundColor: 'var(--color-charcoal)' }} className="text-white">
+    <footer className="bg-[#00113a] text-white w-full">
+      <div className="flex flex-col md:flex-row justify-between items-center px-12 py-16 gap-8 max-w-7xl mx-auto">
 
-      {/* ── Main footer ── */}
-      <div className="container-custom py-14 md:py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
-
-          {/* Col 1 — General */}
-          <div>
-            <h5 className="text-[10px] font-bold tracking-[0.12em] uppercase text-white/40 mb-4">
-              Geral
-            </h5>
-            <ul className="flex flex-col gap-2.5">
-              {[
-                { label: 'Sobre Nós',     href: '#' },
-                { label: 'Blog',          href: '#' },
-                { label: 'Como Funciona', href: '#' },
-                { label: 'Contato',       href: `https://wa.me/${WHATSAPP_NUMBER}` },
-              ].map(({ label, href }) => (
-                <li key={label}>
-                  <a
-                    href={href}
-                    target={href.startsWith('http') ? '_blank' : undefined}
-                    rel="noopener noreferrer"
-                    className="text-[13px] text-white/50 hover:text-white transition-colors"
-                  >
-                    {label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Col 2 — Products */}
-          <div>
-            <h5 className="text-[10px] font-bold tracking-[0.12em] uppercase text-white/40 mb-4">
-              Produtos
-            </h5>
-            <ul className="flex flex-col gap-2.5">
-              {categories.slice(0, 5).map(cat => (
-                <li key={cat.id}>
-                  <Link
-                    to={`/categoria/${cat.slug}`}
-                    className="text-[13px] text-white/50 hover:text-white transition-colors"
-                  >
-                    {cat.name}
-                  </Link>
-                </li>
-              ))}
-              <li>
-                <Link
-                  to="/categorias"
-                  className="text-[13px] text-white/50 hover:text-white transition-colors"
-                >
-                  Ver tudo
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Col 3 — Customer Service */}
-          <div>
-            <h5 className="text-[10px] font-bold tracking-[0.12em] uppercase text-white/40 mb-4">
-              Atendimento
-            </h5>
-            <ul className="flex flex-col gap-2.5">
-              {[
-                { label: 'FAQ',                href: '#' },
-                { label: 'Ajuda & Suporte',    href: `https://wa.me/${WHATSAPP_NUMBER}` },
-                { label: 'Trocas e Devoluções',href: '#' },
-                { label: 'Tabela de Medidas',  href: '#' },
-              ].map(({ label, href }) => (
-                <li key={label}>
-                  <a
-                    href={href}
-                    target={href.startsWith('http') ? '_blank' : undefined}
-                    rel="noopener noreferrer"
-                    className="text-[13px] text-white/50 hover:text-white transition-colors"
-                  >
-                    {label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Col 4 — Social */}
-          <div>
-            <h5 className="text-[10px] font-bold tracking-[0.12em] uppercase text-white/40 mb-4">
-              Redes Sociais
-            </h5>
-            <ul className="flex flex-col gap-2.5">
-              {[
-                { label: 'Instagram', href: 'https://instagram.com/zaiwear' },
-                { label: 'TikTok',    href: '#' },
-                { label: 'Facebook',  href: '#' },
-                { label: 'YouTube',   href: '#' },
-              ].map(({ label, href }) => (
-                <li key={label}>
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[13px] text-white/50 hover:text-white transition-colors"
-                  >
-                    {label}
-                  </a>
-                </li>
-              ))}
-            </ul>
+        {/* Brand + copyright */}
+        <div className="flex flex-col items-center md:items-start gap-4">
+          <Link to="/" className="font-headline text-lg font-bold text-white">
+            ZaiWear
+          </Link>
+          <p className="font-body text-xs font-light tracking-wide text-white/60 max-w-xs text-center md:text-left">
+            Moda Plus Size com estilo, conforto e qualidade premium.
+          </p>
+          <div className="font-body text-[10px] tracking-wide text-white/40 uppercase">
+            © {new Date().getFullYear()} ZaiWear — Globo Confecções. Todos os direitos reservados.
           </div>
         </div>
-      </div>
 
-      {/* ── Bottom bar ── */}
-      <div className="border-t border-white/8">
-        <div className="container-custom py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-
-          {/* Brand */}
-          <Link to="/" className="shrink-0">
-            <span className="font-display text-xl font-bold tracking-tight">
-              Zai<span style={{ color: 'var(--color-accent)' }}>Wear</span>
-            </span>
-          </Link>
-
-          <p className="text-[11px] text-white/30 order-last sm:order-none">
-            © {new Date().getFullYear()} ZaiWear — Globo Confecções. Todos os direitos reservados.
-          </p>
-
-          {/* Social icons */}
-          <div className="flex items-center gap-2">
-            <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center w-8 h-8 rounded-full bg-white/8 hover:bg-white/15 transition-colors"
-              aria-label="WhatsApp"
-            >
-              <WhatsAppIcon className="w-3.5 h-3.5" />
-            </a>
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center w-8 h-8 rounded-full bg-white/8 hover:bg-white/15 transition-colors"
-              aria-label="Instagram"
-            >
-              <Camera size={14} />
-            </a>
-            <a
-              href="mailto:contato@zaiwear.com"
-              className="flex items-center justify-center w-8 h-8 rounded-full bg-white/8 hover:bg-white/15 transition-colors"
-              aria-label="Email"
-            >
-              <Mail size={14} />
-            </a>
+        {/* Nav links */}
+        <nav className="flex flex-wrap justify-center gap-8 font-body text-xs font-light tracking-wide">
+          {categories.slice(0, 4).map(cat => (
             <Link
-              to="/admin/login"
-              className="flex items-center justify-center w-8 h-8 rounded-full bg-white/8 hover:bg-white/15 transition-colors text-[10px] font-bold text-white/30 hover:text-white/60"
-              aria-label="Admin"
+              key={cat.id}
+              to={`/categoria/${cat.slug}`}
+              className="text-white/60 hover:text-white transition-opacity"
             >
-              ADM
+              {cat.name}
             </Link>
-          </div>
+          ))}
+          <Link to="/categorias" className="text-white/60 hover:text-white transition-opacity">
+            Ver tudo
+          </Link>
+          <a href="#" className="text-white/60 hover:text-white transition-opacity">
+            Sobre Nós
+          </a>
+          <a
+            href={`https://wa.me/${WHATSAPP_NUMBER}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white/60 hover:text-white transition-opacity"
+          >
+            Contato
+          </a>
+          <Link to="/admin/login" className="text-white/60 hover:text-white transition-opacity">
+            Admin
+          </Link>
+        </nav>
+
+        {/* Social icons */}
+        <div className="flex gap-6">
+          <a
+            href="https://instagram.com/zaiwear"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+          >
+            <span className="material-symbols-outlined cursor-pointer opacity-60 hover:opacity-100 hover:text-[#fe7e4f] transition-all">
+              camera
+            </span>
+          </a>
+          <a
+            href={`https://wa.me/${WHATSAPP_NUMBER}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="WhatsApp"
+          >
+            <span className="material-symbols-outlined cursor-pointer opacity-60 hover:opacity-100 hover:text-[#fe7e4f] transition-all">
+              chat
+            </span>
+          </a>
+          <a href="mailto:contato@zaiwear.com" aria-label="Email">
+            <span className="material-symbols-outlined cursor-pointer opacity-60 hover:opacity-100 hover:text-[#fe7e4f] transition-all">
+              mail
+            </span>
+          </a>
         </div>
       </div>
     </footer>

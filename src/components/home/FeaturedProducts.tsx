@@ -1,45 +1,36 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
-import { useFeaturedProducts } from '@/hooks/useProducts'
+import { useFeaturedProducts, useProducts } from '@/hooks/useProducts'
 import { ProductCard } from '@/components/products/ProductCard'
 
 export function FeaturedProducts() {
-  const { data: products = [], isLoading } = useFeaturedProducts()
+  const { data: featured = [], isLoading: loadingFeatured } = useFeaturedProducts()
+  const { data: allProducts = [], isLoading: loadingAll } = useProducts()
+
+  // Fallback: if no featured products, show the first 8 from the database
+  const products = featured.length > 0 ? featured : allProducts.slice(0, 8)
+  const isLoading = loadingFeatured || (featured.length === 0 && loadingAll)
 
   return (
-    <section className="py-16 bg-[#F7F5F2]">
-      <div className="container-custom">
+    <section className="py-24 bg-[#f8f9fa]">
+      <div className="max-w-7xl mx-auto px-6">
 
         {/* Header */}
-        <div className="flex items-end justify-between mb-10">
-          <div>
-            <p className="section-label mb-2">Selecionados para você</p>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-              Produtos em Destaque
-            </h2>
-          </div>
-          <Link
-            to="/categorias"
-            className="hidden sm:flex items-center gap-1.5 text-[13px] font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
-          >
-            Ver todos
-            <ArrowRight size={14} />
-          </Link>
+        <div className="text-center mb-16">
+          <h2 className="font-headline text-4xl font-extrabold tracking-tight text-[#00113a]">
+            Mais Vendidos
+          </h2>
+          <div className="h-1 w-20 secondary-gradient mx-auto mt-4"></div>
         </div>
 
         {/* Products */}
         {isLoading ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="rounded-2xl bg-white animate-pulse" style={{ height: 340 }} />
+              <div key={i} className="bg-[#edeeef] animate-pulse" style={{ height: 360 }} />
             ))}
           </div>
-        ) : products.length === 0 ? (
-          <div className="text-center py-20 text-muted-foreground text-sm">
-            Nenhum produto em destaque no momento.
-          </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
             {products.map((product, i) => (
               <div
                 key={product.id}
@@ -52,15 +43,14 @@ export function FeaturedProducts() {
           </div>
         )}
 
-        {/* Mobile CTA */}
-        <div className="mt-8 sm:hidden text-center">
+        {/* CTA */}
+        <div className="mt-16 text-center">
           <Link
             to="/categorias"
-            className="inline-flex items-center gap-1.5 text-[13px] font-semibold"
-            style={{ color: 'var(--color-accent)' }}
+            className="inline-flex items-center gap-2 font-headline text-sm font-bold uppercase tracking-widest text-[#00113a] border-b-2 border-[#00113a] pb-1 hover:text-[#a43c12] hover:border-[#a43c12] transition-colors"
           >
             Ver todos os produtos
-            <ArrowRight size={14} />
+            <span className="material-symbols-outlined text-sm">arrow_forward</span>
           </Link>
         </div>
       </div>

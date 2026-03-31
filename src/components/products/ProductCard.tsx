@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ShoppingBag, X, Check } from 'lucide-react'
+import { X, Check } from 'lucide-react'
 import { useCart } from '@/contexts/CartContext'
 import { formatPrice } from '@/lib/utils'
 import type { Product, ProductColor, ProductSize } from '@/types/product'
@@ -49,9 +49,9 @@ export function ProductCard({ product }: Props) {
     <>
       <article className="card-product flex flex-col group">
 
-        {/* ── Image ── */}
+        {/* Image */}
         <div
-          className="relative overflow-hidden bg-muted cursor-zoom-in"
+          className="relative overflow-hidden bg-[#edeeef] cursor-zoom-in"
           style={{ aspectRatio: '3/4' }}
           onClick={() => currentImage && setZoomOpen(true)}
         >
@@ -59,29 +59,56 @@ export function ProductCard({ product }: Props) {
             <img
               src={currentImage}
               alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               loading="lazy"
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-muted">
-              <ShoppingBag size={36} className="text-muted-foreground/20" />
-              <span className="text-[11px] text-muted-foreground/40">Sem imagem</span>
+            <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-[#edeeef]">
+              <span className="material-symbols-outlined text-[#444650]/20" style={{ fontSize: '3rem' }}>
+                shopping_bag
+              </span>
+              <span className="text-[11px] text-[#444650]/40 font-body">Sem imagem</span>
             </div>
           )}
 
           {/* Category badge */}
           {product.categories?.name && (
-            <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[10px] font-semibold tracking-wider uppercase px-2 py-1 rounded-full text-foreground">
+            <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[10px] font-bold tracking-widest uppercase px-2 py-1 text-[#00113a] font-headline">
               {product.categories.name}
             </span>
           )}
+
+          {/* Slide-up add button */}
+          <button
+            onClick={e => { e.stopPropagation(); handleAddToCart() }}
+            disabled={!selectedSize}
+            className={`absolute bottom-0 left-0 w-full py-4 font-headline text-sm font-bold tracking-widest translate-y-full group-hover:translate-y-0 transition-transform duration-300 active:scale-95 ${
+              added
+                ? 'bg-emerald-600 text-white'
+                : selectedSize
+                  ? 'secondary-gradient text-white'
+                  : 'bg-[#444650] text-white cursor-not-allowed'
+            }`}
+          >
+            {added ? '✓ ADICIONADO!' : selectedSize ? 'ADICIONAR' : 'SELECIONE O TAMANHO'}
+          </button>
         </div>
 
-        {/* ── Content ── */}
-        <div className="flex flex-col gap-2.5 p-3.5">
+        {/* Content */}
+        <div className="flex flex-col gap-2.5 p-4">
+
+          {/* Price */}
+          <div className="flex items-baseline gap-2">
+            <span className="font-body text-base font-semibold text-[#00113a]/70">
+              {formatPrice(currentPrice)}
+            </span>
+            {!selectedSize && sizes.length > 0 && (
+              <span className="text-[10px] text-[#444650] font-body">a partir de</span>
+            )}
+          </div>
 
           {/* Name */}
-          <h3 className="font-sans text-[13px] font-semibold text-foreground leading-snug line-clamp-2 uppercase tracking-wide">
+          <h3 className="font-headline text-sm font-bold text-[#00113a] leading-snug line-clamp-2 tracking-tight group-hover:text-[#a43c12] transition-colors">
             {product.name}
           </h3>
 
@@ -96,7 +123,7 @@ export function ProductCard({ product }: Props) {
                   style={{
                     backgroundColor: color.hex,
                     outline: selectedColor?.id === color.id
-                      ? `2px solid var(--color-primary)`
+                      ? '2px solid #a43c12'
                       : '2px solid transparent',
                     outlineOffset: '2px',
                   }}
@@ -121,7 +148,7 @@ export function ProductCard({ product }: Props) {
               {sizes.map(size => (
                 <button
                   key={size.id}
-                  onClick={() => size.available ? setSelectedSize(size) : null}
+                  onClick={() => size.available ? setSelectedSize(size) : undefined}
                   disabled={!size.available}
                   className={`badge-size touch-manipulation ${
                     selectedSize?.id === size.id ? 'badge-size-active' : ''
@@ -133,31 +160,17 @@ export function ProductCard({ product }: Props) {
             </div>
           )}
 
-          {/* Price */}
-          <div className="flex items-baseline gap-2 mt-0.5">
-            <span
-              className="text-[15px] font-bold"
-              style={{ color: 'var(--color-primary)' }}
-            >
-              {formatPrice(currentPrice)}
-            </span>
-            {!selectedSize && sizes.length > 0 && (
-              <span className="text-[10px] text-muted-foreground">a partir de</span>
-            )}
-          </div>
-
-          {/* Add to cart */}
+          {/* Explicit add button (always visible) */}
           <button
             onClick={handleAddToCart}
             disabled={!selectedSize}
-            className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all duration-200 active:scale-95 touch-manipulation ${
-              added ? 'bg-emerald-600 text-white' : ''
+            className={`w-full flex items-center justify-center gap-2 py-3 font-headline text-[11px] font-bold uppercase tracking-widest transition-all duration-200 active:scale-95 touch-manipulation mt-1 ${
+              added
+                ? 'bg-emerald-600 text-white'
+                : selectedSize
+                  ? 'secondary-gradient text-white'
+                  : 'bg-[#edeeef] text-[#444650] cursor-not-allowed'
             }`}
-            style={!added ? {
-              backgroundColor: selectedSize ? 'var(--color-primary)' : 'var(--color-muted)',
-              color: selectedSize ? 'white' : 'var(--color-muted-foreground)',
-              cursor: selectedSize ? 'pointer' : 'not-allowed',
-            } : {}}
           >
             {added ? (
               <>
@@ -166,7 +179,7 @@ export function ProductCard({ product }: Props) {
               </>
             ) : (
               <>
-                <ShoppingBag size={13} />
+                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>shopping_bag</span>
                 {selectedSize ? 'Adicionar' : 'Selecione o tamanho'}
               </>
             )}
@@ -174,7 +187,7 @@ export function ProductCard({ product }: Props) {
         </div>
       </article>
 
-      {/* ── Zoom Modal ── */}
+      {/* Zoom Modal */}
       {zoomOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 animate-fade-in"
@@ -182,7 +195,7 @@ export function ProductCard({ product }: Props) {
         >
           <button
             onClick={() => setZoomOpen(false)}
-            className="absolute top-4 right-4 flex items-center justify-center w-10 h-10 rounded-full bg-white/15 text-white hover:bg-white/25 transition-colors"
+            className="absolute top-4 right-4 flex items-center justify-center w-10 h-10 bg-white/15 text-white hover:bg-white/25 transition-colors"
             aria-label="Fechar"
           >
             <X size={18} />
@@ -190,7 +203,7 @@ export function ProductCard({ product }: Props) {
           <img
             src={currentImage ?? ''}
             alt={product.name}
-            className="max-w-full max-h-[88vh] rounded-2xl object-contain shadow-2xl"
+            className="max-w-full max-h-[88vh] object-contain shadow-2xl"
             onClick={e => e.stopPropagation()}
           />
         </div>

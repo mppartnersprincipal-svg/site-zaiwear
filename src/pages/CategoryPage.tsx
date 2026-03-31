@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { SlidersHorizontal, X, ChevronDown, ChevronUp, ArrowUpRight } from 'lucide-react'
+import { X, ChevronDown, ChevronUp } from 'lucide-react'
 import { useProductsByCategory } from '@/hooks/useProducts'
 import { useCategories } from '@/hooks/useCategories'
 import { ProductCard } from '@/components/products/ProductCard'
@@ -17,7 +17,6 @@ const SORT_LABELS: Record<SortOption, string> = {
 
 const ITEMS_PER_PAGE = 12
 
-// Placeholder images for category banner
 const BANNER_IMAGES = [
   'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1400&q=80',
   'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=1400&q=80',
@@ -31,7 +30,6 @@ export default function CategoryPage() {
 
   const currentCategory = categories.find(c => c.slug === slug)
 
-  // Filter state
   const [selectedSizes, setSelectedSizes]   = useState<string[]>([])
   const [selectedColors, setSelectedColors] = useState<string[]>([])
   const [priceRange, setPriceRange]         = useState<[number, number]>([0, 500])
@@ -40,7 +38,6 @@ export default function CategoryPage() {
   const [page, setPage] = useState(1)
   const [filtersExpanded, setFiltersExpanded] = useState({ size: true, color: true, price: true })
 
-  // Derived filter options
   const allSizes = useMemo(() => {
     const s = new Set<string>()
     products.forEach(p => p.product_sizes?.forEach(sz => s.add(sz.size)))
@@ -59,7 +56,6 @@ export default function CategoryPage() {
     return Math.ceil(max / 50) * 50 || 500
   }, [products])
 
-  // Filtered + sorted
   const filtered = useMemo(() => {
     let result = products.filter((p: Product) => {
       const sizes  = p.product_sizes  ?? []
@@ -102,30 +98,31 @@ export default function CategoryPage() {
   function toggleSize(s: string)  { setSelectedSizes(p  => p.includes(s)  ? p.filter(x => x !== s)  : [...p, s]);  setPage(1) }
   function toggleColor(c: string) { setSelectedColors(p => p.includes(c)  ? p.filter(x => x !== c)  : [...p, c]); setPage(1) }
 
-  // ── Filter panel (shared desktop + mobile) ──
+  // Sidebar filter panel
   const FiltersPanel = () => (
     <div className="flex flex-col gap-6">
 
       {/* Categories */}
       <div>
-        <h4 className="text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground mb-3">
-          Categoria
+        <h4 className="font-headline text-sm uppercase tracking-widest text-[#00113a] mb-4 font-bold">
+          Categorias
         </h4>
-        <div className="flex flex-col gap-0.5">
+        <ul className="space-y-3">
           {categories.map(cat => (
-            <Link
-              key={cat.id}
-              to={`/categoria/${cat.slug}`}
-              className={`flex items-center justify-between py-2 px-2 rounded-lg text-[13px] transition-colors ${
-                cat.slug === slug
-                  ? 'font-semibold bg-foreground text-white'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-              }`}
-            >
-              <span>{cat.name}</span>
-            </Link>
+            <li key={cat.id}>
+              <Link
+                to={`/categoria/${cat.slug}`}
+                className={`text-sm flex justify-between transition-colors ${
+                  cat.slug === slug
+                    ? 'text-[#a43c12] font-semibold'
+                    : 'text-[#444650] hover:text-[#a43c12]'
+                }`}
+              >
+                {cat.name}
+              </Link>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
 
       <hr className="divider" />
@@ -133,7 +130,7 @@ export default function CategoryPage() {
       {/* Price */}
       <div>
         <button
-          className="flex items-center justify-between w-full text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground mb-3"
+          className="flex items-center justify-between w-full font-headline text-sm uppercase tracking-widest text-[#00113a] font-bold mb-4"
           onClick={() => setFiltersExpanded(p => ({ ...p, price: !p.price }))}
         >
           Preço
@@ -148,12 +145,11 @@ export default function CategoryPage() {
               step={10}
               value={priceRange[1]}
               onChange={e => { setPriceRange([priceRange[0], Number(e.target.value)]); setPage(1) }}
-              className="w-full"
-              style={{ accentColor: 'var(--color-primary)' }}
+              className="w-full h-1 bg-[#e7e8e9] appearance-none cursor-pointer accent-[#a43c12]"
             />
-            <div className="flex items-center justify-between text-[12px] text-muted-foreground font-medium">
-              <span className="bg-muted px-2 py-1 rounded">R$ {priceRange[0]}</span>
-              <span className="bg-muted px-2 py-1 rounded">R$ {priceRange[1]}</span>
+            <div className="flex items-center justify-between text-xs font-label text-[#444650] tracking-wider">
+              <span>R$ {priceRange[0]}</span>
+              <span>R$ {priceRange[1]}</span>
             </div>
           </div>
         )}
@@ -165,25 +161,27 @@ export default function CategoryPage() {
           <hr className="divider" />
           <div>
             <button
-              className="flex items-center justify-between w-full text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground mb-3"
+              className="flex items-center justify-between w-full font-headline text-sm uppercase tracking-widest text-[#00113a] font-bold mb-4"
               onClick={() => setFiltersExpanded(p => ({ ...p, color: !p.color }))}
             >
-              Cor
+              Cores
               {filtersExpanded.color ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
             </button>
             {filtersExpanded.color && (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3">
                 {allColors.map(({ name, hex }) => (
                   <button
                     key={name}
                     onClick={() => toggleColor(name)}
                     title={name}
-                    className="w-7 h-7 rounded-full border-2 transition-all"
+                    className="w-6 h-6 rounded-full transition-all"
                     style={{
                       backgroundColor: hex,
-                      borderColor: selectedColors.includes(name) ? 'var(--color-primary)' : 'var(--color-border)',
-                      outline: selectedColors.includes(name) ? `2px solid var(--color-primary)` : 'none',
+                      outline: selectedColors.includes(name)
+                        ? '2px solid #a43c12'
+                        : '2px solid transparent',
                       outlineOffset: '2px',
+                      border: '1px solid rgba(197,198,210,0.5)',
                     }}
                   />
                 ))}
@@ -199,19 +197,23 @@ export default function CategoryPage() {
           <hr className="divider" />
           <div>
             <button
-              className="flex items-center justify-between w-full text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground mb-3"
+              className="flex items-center justify-between w-full font-headline text-sm uppercase tracking-widest text-[#00113a] font-bold mb-4"
               onClick={() => setFiltersExpanded(p => ({ ...p, size: !p.size }))}
             >
-              Tamanho
+              Tamanhos
               {filtersExpanded.size ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
             </button>
             {filtersExpanded.size && (
-              <div className="grid grid-cols-3 gap-1.5">
+              <div className="grid grid-cols-2 gap-2">
                 {allSizes.map(s => (
                   <button
                     key={s}
                     onClick={() => toggleSize(s)}
-                    className={`badge-size text-[11px] ${selectedSizes.includes(s) ? 'badge-size-active' : ''}`}
+                    className={`border py-2 text-xs font-headline font-bold uppercase tracking-widest transition-all ${
+                      selectedSizes.includes(s)
+                        ? 'border-[#a43c12] text-[#a43c12]'
+                        : 'border-[#c5c6d2]/30 text-[#444650] hover:border-[#a43c12] hover:text-[#a43c12]'
+                    }`}
                   >
                     {s}
                   </button>
@@ -222,10 +224,21 @@ export default function CategoryPage() {
         </>
       )}
 
+      {/* Sustainability note */}
+      <div className="bg-[#f3f4f5] p-6 space-y-3">
+        <span className="material-symbols-outlined text-[#a43c12]">favorite</span>
+        <p className="font-headline text-xs font-bold uppercase tracking-widest text-[#00113a]">
+          Moda Para Todos
+        </p>
+        <p className="text-xs text-[#444650] leading-relaxed font-body font-light">
+          Peças desenvolvidas com qualidade premium para todos os corpos, do XG ao G9.
+        </p>
+      </div>
+
       {hasActiveFilters && (
         <button
           onClick={clearFilters}
-          className="text-[12px] text-destructive hover:underline self-start font-medium"
+          className="text-xs text-red-600 hover:underline self-start font-headline font-bold uppercase tracking-widest"
         >
           Limpar filtros
         </button>
@@ -233,13 +246,12 @@ export default function CategoryPage() {
     </div>
   )
 
-  // Category index for placeholder banner
   const catIndex = categories.findIndex(c => c.slug === slug)
 
   return (
-    <div>
+    <div className="bg-[#f8f9fa]">
 
-      {/* ── Category Banner ── */}
+      {/* Category Banner */}
       <div
         className="relative h-36 md:h-52 flex items-end overflow-hidden"
         style={{
@@ -250,69 +262,51 @@ export default function CategoryPage() {
           backgroundPosition: 'center',
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent" />
-        <div className="container-custom pb-6 relative z-10">
-          <nav className="flex items-center gap-1.5 text-white/60 text-[11px] font-medium mb-2">
+        <div className="absolute inset-0 bg-gradient-to-t from-[#00113a]/70 via-[#00113a]/20 to-transparent" />
+        <div className="max-w-7xl mx-auto w-full px-6 pb-6 relative z-10">
+          <nav className="flex items-center gap-1.5 text-white/60 text-[11px] font-headline font-medium mb-2 uppercase tracking-widest">
             <Link to="/" className="hover:text-white transition-colors">Início</Link>
             <span>/</span>
             <span className="text-white">{currentCategory?.name ?? slug}</span>
           </nav>
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-white">
+          <h1 className="font-headline text-2xl md:text-3xl font-extrabold tracking-tight text-white">
             {currentCategory?.name ?? slug}
           </h1>
           {currentCategory?.description && (
-            <p className="text-white/70 text-[13px] mt-1">{currentCategory.description}</p>
+            <p className="text-white/70 text-sm mt-1 font-body">{currentCategory.description}</p>
           )}
         </div>
       </div>
 
-      {/* ── Main layout ── */}
-      <div className="container-custom py-8">
-        <div className="flex gap-7">
+      {/* Main layout */}
+      <main className="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row gap-12">
 
-          {/* ── Sidebar ── */}
-          <aside className="hidden lg:block w-60 shrink-0">
-            <div className="sticky top-24 bg-white rounded-2xl border border-border p-5">
-              <div className="flex items-center justify-between mb-5">
-                <h3 className="font-sans text-[13px] font-bold uppercase tracking-wider text-foreground">
-                  Filtrar Produtos
-                </h3>
-                {hasActiveFilters && (
-                  <span
-                    className="text-[10px] font-bold text-white px-2 py-0.5 rounded-full"
-                    style={{ backgroundColor: 'var(--color-primary)' }}
-                  >
-                    {selectedSizes.length + selectedColors.length}
-                  </span>
-                )}
-              </div>
-              <FiltersPanel />
-            </div>
-          </aside>
+        {/* Sidebar */}
+        <aside className="hidden lg:block w-64 shrink-0 space-y-10">
+          <FiltersPanel />
+        </aside>
 
-          {/* ── Products area ── */}
-          <div className="flex-1 min-w-0">
+        {/* Products area */}
+        <section className="flex-1">
 
-            {/* Toolbar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[13px] text-muted-foreground">
-                  {isLoading
-                    ? 'Carregando...'
-                    : `Mostrando ${paginated.length} de ${filtered.length} resultados`}
-                  {filtered.length !== products.length && (
-                    <span> de {products.length} para </span>
-                  )}
-                  {currentCategory && (
-                    <strong className="text-foreground ml-1">{currentCategory.name}</strong>
-                  )}
-                </span>
+          {/* Toolbar */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12 gap-6">
+            <div>
+              <h2 className="font-headline text-4xl font-extrabold tracking-tighter text-[#00113a] mb-1">
+                {currentCategory?.name ?? 'Produtos'}
+              </h2>
+              <p className="text-[#444650] font-light text-sm tracking-wide font-body">
+                {isLoading
+                  ? 'Carregando...'
+                  : `Mostrando ${paginated.length} de ${filtered.length} ${filtered.length === 1 ? 'peça' : 'peças'}`}
+              </p>
 
-                {/* Active filter chips */}
+              {/* Active filter chips */}
+              <div className="flex flex-wrap gap-2 mt-3">
                 {selectedSizes.map(s => (
                   <span key={s} className="filter-chip">
                     {s}
-                    <button onClick={() => toggleSize(s)} className="hover:text-destructive transition-colors">
+                    <button onClick={() => toggleSize(s)} className="hover:text-red-500 transition-colors">
                       <X size={11} />
                     </button>
                   </span>
@@ -320,185 +314,188 @@ export default function CategoryPage() {
                 {selectedColors.map(c => (
                   <span key={c} className="filter-chip">
                     {c}
-                    <button onClick={() => toggleColor(c)} className="hover:text-destructive transition-colors">
+                    <button onClick={() => toggleColor(c)} className="hover:text-red-500 transition-colors">
                       <X size={11} />
                     </button>
                   </span>
                 ))}
               </div>
+            </div>
 
-              <div className="flex items-center gap-2">
-                {/* Mobile filter button */}
-                <button
-                  onClick={() => setMobileFiltersOpen(true)}
-                  className="lg:hidden flex items-center gap-2 px-3.5 py-2 border border-border rounded-lg text-[13px] font-medium hover:bg-muted transition-colors"
-                >
-                  <SlidersHorizontal size={14} />
-                  Filtros
-                  {hasActiveFilters && (
-                    <span
-                      className="w-4.5 h-4.5 rounded-full text-white text-[10px] flex items-center justify-center font-bold"
-                      style={{ backgroundColor: 'var(--color-primary)' }}
-                    >
-                      {selectedSizes.length + selectedColors.length}
-                    </span>
-                  )}
-                </button>
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+              {/* Mobile filter button */}
+              <button
+                onClick={() => setMobileFiltersOpen(true)}
+                className="lg:hidden flex items-center gap-2 px-4 py-3 border border-[#c5c6d2]/30 font-headline text-xs uppercase tracking-widest font-bold text-[#00113a] hover:bg-[#f3f4f5] transition-colors"
+              >
+                <span className="material-symbols-outlined text-sm">tune</span>
+                Filtros
+                {hasActiveFilters && (
+                  <span className="bg-[#a43c12] text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                    {selectedSizes.length + selectedColors.length}
+                  </span>
+                )}
+              </button>
 
-                {/* Sort */}
+              {/* Sort */}
+              <div className="relative flex-1 sm:flex-none">
                 <select
                   value={sortBy}
                   onChange={e => { setSortBy(e.target.value as SortOption); setPage(1) }}
-                  className="text-[13px] border border-border rounded-lg px-3 py-2 bg-white focus:outline-none font-medium"
+                  className="appearance-none bg-[#f8f9fa] border-none text-xs font-headline uppercase tracking-widest pr-8 pl-4 py-3 cursor-pointer hover:bg-[#f3f4f5] transition-colors w-full"
                 >
                   {Object.entries(SORT_LABELS).map(([v, l]) => (
                     <option key={v} value={v}>{l}</option>
                   ))}
                 </select>
+                <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[#00113a] pointer-events-none text-sm">
+                  expand_more
+                </span>
               </div>
             </div>
-
-            {/* Product Grid */}
-            {isLoading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="rounded-2xl bg-muted animate-pulse" style={{ height: 360 }} />
-                ))}
-              </div>
-            ) : paginated.length === 0 ? (
-              <div className="text-center py-24">
-                <p className="text-muted-foreground text-sm mb-4">
-                  Nenhum produto encontrado com esses filtros.
-                </p>
-                {hasActiveFilters && (
-                  <button
-                    onClick={clearFilters}
-                    className="btn-primary"
-                    style={{ backgroundColor: 'var(--color-primary)' }}
-                  >
-                    Limpar Filtros
-                  </button>
-                )}
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
-                {paginated.map((product, i) => (
-                  <div
-                    key={product.id}
-                    className="animate-slide-up"
-                    style={{ animationDelay: `${i * 40}ms` }}
-                  >
-                    <ProductCard product={product} />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-1.5 mt-10">
-                <button
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  className="flex items-center gap-1 px-4 py-2.5 border border-border rounded-lg text-[13px] font-medium hover:bg-muted transition-colors disabled:opacity-30"
-                >
-                  ← Anterior
-                </button>
-
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: totalPages }).map((_, i) => {
-                    const p = i + 1
-                    if (p === 1 || p === totalPages || Math.abs(p - page) <= 1) {
-                      return (
-                        <button
-                          key={p}
-                          onClick={() => setPage(p)}
-                          className="w-9 h-9 rounded-lg text-[13px] font-semibold transition-all"
-                          style={{
-                            backgroundColor: p === page ? 'var(--color-primary)' : 'transparent',
-                            color: p === page ? 'white' : 'var(--color-foreground)',
-                            border: p === page ? 'none' : '1.5px solid var(--color-border)',
-                          }}
-                        >
-                          {p}
-                        </button>
-                      )
-                    }
-                    if (Math.abs(p - page) === 2) return (
-                      <span key={p} className="text-muted-foreground px-1">…</span>
-                    )
-                    return null
-                  })}
-                </div>
-
-                <button
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
-                  className="flex items-center gap-1 px-4 py-2.5 border border-border rounded-lg text-[13px] font-medium hover:bg-muted transition-colors disabled:opacity-30"
-                >
-                  Próxima →
-                </button>
-              </div>
-            )}
-
-            {/* Other categories */}
-            {categories.filter(c => c.slug !== slug).length > 0 && (
-              <section className="mt-16 pt-10 border-t border-border">
-                <h2 className="font-display text-2xl font-bold text-foreground mb-6">
-                  Outras Categorias
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {categories.filter(c => c.slug !== slug).slice(0, 4).map(cat => (
-                    <Link
-                      key={cat.id}
-                      to={`/categoria/${cat.slug}`}
-                      className="group flex items-center gap-4 p-4 rounded-xl border border-border hover:border-foreground hover:shadow-md transition-all duration-300"
-                    >
-                      <div className="w-14 h-14 rounded-lg overflow-hidden bg-muted shrink-0">
-                        {cat.image ? (
-                          <img
-                            src={cat.image}
-                            alt={cat.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        ) : (
-                          <div className="w-full h-full gradient-warm" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-[13px] text-foreground">{cat.name}</p>
-                        <p className="text-[12px] text-muted-foreground mt-0.5 truncate">
-                          {cat.description ?? 'Explorar produtos'}
-                        </p>
-                      </div>
-                      <ArrowUpRight
-                        size={16}
-                        className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-                      />
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            )}
           </div>
-        </div>
-      </div>
 
-      {/* ── Mobile Filters Overlay ── */}
+          {/* Product Grid */}
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="bg-[#edeeef] animate-pulse" style={{ height: 400 }} />
+              ))}
+            </div>
+          ) : paginated.length === 0 ? (
+            <div className="text-center py-24">
+              <p className="text-[#444650] text-sm font-body mb-6">
+                Nenhum produto encontrado com esses filtros.
+              </p>
+              {hasActiveFilters && (
+                <button
+                  onClick={clearFilters}
+                  className="secondary-gradient text-white px-8 py-4 font-headline font-bold text-sm tracking-widest uppercase"
+                >
+                  Limpar Filtros
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+              {paginated.map((product, i) => (
+                <div
+                  key={product.id}
+                  className="animate-slide-up"
+                  style={{ animationDelay: `${i * 40}ms` }}
+                >
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <nav className="mt-24 flex items-center justify-center gap-12">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="text-xs uppercase tracking-widest font-headline font-bold text-[#00113a]/40 hover:text-[#a43c12] transition-colors flex items-center gap-2 disabled:opacity-30"
+              >
+                <span className="material-symbols-outlined text-sm">arrow_back</span>
+                Anterior
+              </button>
+
+              <div className="flex gap-8">
+                {Array.from({ length: totalPages }).map((_, i) => {
+                  const p = i + 1
+                  if (p === 1 || p === totalPages || Math.abs(p - page) <= 1) {
+                    return (
+                      <button
+                        key={p}
+                        onClick={() => setPage(p)}
+                        className={`font-body text-sm transition-all ${
+                          p === page
+                            ? 'text-[#a43c12] font-bold border-b-2 border-[#a43c12] pb-1'
+                            : 'text-[#00113a]/40 hover:text-[#00113a] cursor-pointer'
+                        }`}
+                      >
+                        {String(p).padStart(2, '0')}
+                      </button>
+                    )
+                  }
+                  if (Math.abs(p - page) === 2) return (
+                    <span key={p} className="text-[#444650] text-sm">...</span>
+                  )
+                  return null
+                })}
+              </div>
+
+              <button
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="text-xs uppercase tracking-widest font-headline font-bold text-[#00113a] hover:text-[#a43c12] transition-colors flex items-center gap-2 disabled:opacity-30"
+              >
+                Próxima
+                <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </button>
+            </nav>
+          )}
+
+          {/* Other categories */}
+          {categories.filter(c => c.slug !== slug).length > 0 && (
+            <section className="mt-24 pt-12 border-t border-[#c5c6d2]/30">
+              <h2 className="font-headline text-2xl font-bold text-[#00113a] mb-8 tracking-tight">
+                Outras Categorias
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {categories.filter(c => c.slug !== slug).slice(0, 4).map(cat => (
+                  <Link
+                    key={cat.id}
+                    to={`/categoria/${cat.slug}`}
+                    className="group flex items-center gap-4 p-4 border border-[#c5c6d2]/30 hover:border-[#00113a] hover:shadow-md transition-all duration-300"
+                  >
+                    <div className="w-14 h-14 overflow-hidden bg-[#edeeef] shrink-0">
+                      {cat.image ? (
+                        <img
+                          src={cat.image}
+                          alt={cat.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full gradient-warm" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-headline font-bold text-sm text-[#00113a] group-hover:text-[#a43c12] transition-colors">
+                        {cat.name}
+                      </p>
+                      <p className="text-xs text-[#444650] mt-0.5 truncate font-body font-light">
+                        {cat.description ?? 'Explorar produtos'}
+                      </p>
+                    </div>
+                    <span className="material-symbols-outlined text-[#444650] opacity-0 group-hover:opacity-100 transition-opacity shrink-0 text-sm">
+                      arrow_forward
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+        </section>
+      </main>
+
+      {/* Mobile Filters Overlay */}
       {mobileFiltersOpen && (
         <>
           <div
             className="fixed inset-0 z-40 bg-black/40 animate-fade-in"
             onClick={() => setMobileFiltersOpen(false)}
           />
-          <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl p-5 max-h-[82vh] overflow-y-auto animate-slide-up safe-area-inset">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="font-sans text-[13px] font-bold uppercase tracking-wider">
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#f8f9fa] p-6 max-h-[82vh] overflow-y-auto animate-slide-up safe-area-inset">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-headline text-sm font-bold uppercase tracking-widest text-[#00113a]">
                 Filtrar Produtos
               </h3>
               <button
                 onClick={() => setMobileFiltersOpen(false)}
-                className="p-2 rounded-lg hover:bg-muted"
+                className="flex items-center justify-center w-9 h-9 hover:bg-[#edeeef] transition-colors"
               >
                 <X size={17} />
               </button>
@@ -506,8 +503,7 @@ export default function CategoryPage() {
             <FiltersPanel />
             <button
               onClick={() => setMobileFiltersOpen(false)}
-              className="w-full mt-5 py-3.5 rounded-xl text-[13px] font-bold uppercase tracking-wider text-white"
-              style={{ backgroundColor: 'var(--color-primary)' }}
+              className="w-full mt-6 py-4 font-headline text-sm font-bold uppercase tracking-widest text-white secondary-gradient"
             >
               Ver {filtered.length} produto{filtered.length !== 1 ? 's' : ''}
             </button>

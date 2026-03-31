@@ -8,47 +8,46 @@ export default function Index() {
   return (
     <>
       <HeroSection />
-      <BrandValues />
       <CategoryShowcase />
       <FeaturedProducts />
+      <BrandValues />
 
-      {/* ── Instagram / Catalog CTA ── */}
-      <section
-        className="py-20 text-center relative overflow-hidden"
-        style={{
-          background:
-            'linear-gradient(rgba(0,0,0,0.60), rgba(0,0,0,0.60)), url("https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1400&q=80") center/cover',
-        }}
-      >
-        <div className="container-custom relative z-10">
-          <p
-            className="section-label mb-4"
-            style={{ color: 'var(--color-accent)' }}
-          >
-            Catálogo de Moda
-          </p>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-4">
-            EXPLORE NOSSO CATÁLOGO DE MODA
+      {/* Catálogo CTA */}
+      <section className="relative py-24 text-center overflow-hidden">
+        {/* Background */}
+        <div
+          className="absolute inset-0 -z-10"
+          style={{
+            background:
+              'linear-gradient(rgba(0,17,58,0.75), rgba(0,17,58,0.75)), url("https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1400&q=80") center/cover',
+          }}
+        />
+
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <span className="inline-block font-headline text-sm uppercase tracking-[0.2em] text-[#fe7e4f] mb-4">
+            Catálogo Completo
+          </span>
+          <h2 className="font-headline text-4xl lg:text-5xl font-extrabold tracking-tight text-white mb-6">
+            EXPLORE NOSSA COLEÇÃO
           </h2>
-          <p className="text-white/60 text-[14px] max-w-xl mx-auto mb-8 leading-relaxed">
+          <p className="text-white/60 text-base max-w-xl mx-auto mb-10 leading-relaxed font-body">
             Navegue pelo catálogo para encontrar uma ampla variedade de roupas estilosas.
             Do clássico ao moderno, tem algo para todos os gostos.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-6">
             <Link
               to="/categorias"
-              className="btn-primary"
-              style={{ backgroundColor: 'white', color: '#111' }}
+              className="secondary-gradient text-white px-8 py-4 font-headline font-bold text-sm tracking-widest uppercase hover:shadow-xl transition-all active:scale-95"
             >
-              Ver Coleção →
+              Ver Coleção
             </Link>
             <a
               href="https://instagram.com/zaiwear"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 border border-white/40 text-white/90 text-[13px] font-semibold uppercase tracking-wider px-6 py-3 rounded-lg hover:bg-white/10 transition-colors"
+              className="border border-white/20 text-white/90 font-headline font-bold text-sm tracking-widest uppercase px-8 py-4 hover:bg-white/10 transition-all"
             >
-              VER NOSSO INSTAGRAM →
+              Nosso Instagram
             </a>
           </div>
         </div>

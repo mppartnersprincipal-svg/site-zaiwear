@@ -1,8 +1,6 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { useCategories } from '@/hooks/useCategories'
 
-// Placeholder images for when category has no image
 const PLACEHOLDER_IMAGES = [
   'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&q=80&fit=crop',
   'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&q=80&fit=crop',
@@ -15,77 +13,75 @@ export function CategoryShowcase() {
   const { data: categories = [], isLoading } = useCategories()
 
   return (
-    <section className="py-16 bg-white">
-      <div className="container-custom">
+    <section className="py-24 bg-[#f3f4f5]">
+      <div className="max-w-7xl mx-auto px-6">
 
         {/* Header */}
-        <div className="flex items-end justify-between mb-10">
+        <div className="flex justify-between items-end mb-12">
           <div>
-            <p className="section-label mb-2">Explorar</p>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-              Nossas Categorias
+            <h2 className="font-headline text-3xl font-bold tracking-tight text-[#00113a]">
+              Coleções em Destaque
             </h2>
+            <p className="font-body text-[#444650] mt-2">Explore por categoria</p>
           </div>
-          <Link
-            to="/categorias"
-            className="hidden sm:flex items-center gap-1.5 text-[13px] font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
-          >
-            Ver todas
-            <ArrowRight size={14} />
-          </Link>
+          <div className="flex gap-2">
+            <Link
+              to="/categorias"
+              className="p-2 border border-[#c5c6d2]/30 hover:bg-white transition-colors"
+              aria-label="Ver todas as categorias"
+            >
+              <span className="material-symbols-outlined text-[#00113a]">chevron_right</span>
+            </Link>
+          </div>
         </div>
 
-        {/* Grid */}
+        {/* Horizontal scroll carousel */}
         {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="aspect-[3/4] rounded-2xl bg-muted animate-pulse" />
+          <div className="flex gap-6 overflow-x-auto no-scrollbar pb-8">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex-none w-64 aspect-square bg-[#edeeef] animate-pulse"
+              />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="flex overflow-x-auto gap-6 no-scrollbar pb-8">
             {categories.map((cat, i) => (
               <Link
                 key={cat.id}
                 to={`/categoria/${cat.slug}`}
-                className="group relative aspect-[3/4] rounded-2xl overflow-hidden block animate-slide-up"
+                className="flex-none w-64 group cursor-pointer animate-slide-up"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
-                {/* Image */}
-                <img
-                  src={cat.image ?? PLACEHOLDER_IMAGES[i % PLACEHOLDER_IMAGES.length]}
-                  alt={cat.name}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-108"
-                  style={{ '--tw-scale-x': '1.08', '--tw-scale-y': '1.08' } as React.CSSProperties}
-                />
-
-                {/* Overlay gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
-
-                {/* Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <h3 className="font-sans text-white text-[13px] font-semibold leading-snug">
-                    {cat.name}
-                  </h3>
-                  <div className="flex items-center gap-1 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="text-white/80 text-[11px]">Ver produtos</span>
-                    <ArrowUpRight size={11} className="text-white/80" />
-                  </div>
+                <div className="aspect-square bg-[#edeeef] overflow-hidden mb-4">
+                  <img
+                    src={cat.image ?? PLACEHOLDER_IMAGES[i % PLACEHOLDER_IMAGES.length]}
+                    alt={cat.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
                 </div>
+                <h3 className="font-headline font-bold text-[#00113a] tracking-tight">
+                  {cat.name}
+                </h3>
+                {cat.description && (
+                  <p className="text-xs text-[#444650] uppercase tracking-widest mt-1 line-clamp-1">
+                    {cat.description}
+                  </p>
+                )}
               </Link>
             ))}
           </div>
         )}
 
         {/* Mobile CTA */}
-        <div className="mt-6 sm:hidden text-center">
+        <div className="mt-6 text-center md:hidden">
           <Link
             to="/categorias"
-            className="inline-flex items-center gap-1.5 text-[13px] font-semibold"
-            style={{ color: 'var(--color-accent)' }}
+            className="inline-flex items-center gap-1.5 font-headline text-sm font-bold text-[#a43c12] uppercase tracking-widest"
           >
             Ver todas as categorias
-            <ArrowRight size={14} />
+            <span className="material-symbols-outlined text-sm">arrow_forward</span>
           </Link>
         </div>
       </div>

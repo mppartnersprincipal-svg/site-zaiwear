@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { ShoppingBag, Search, Menu, X, ChevronDown } from 'lucide-react'
 import { useCart } from '@/contexts/CartContext'
 import { useCategories } from '@/hooks/useCategories'
 
@@ -9,165 +8,119 @@ export function Header() {
   const { data: categories = [] } = useCategories()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [shopOpen, setShopOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
   const cartCount = getCartCount()
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  // fecha dropdown ao navegar
   useEffect(() => {
     setShopOpen(false)
     setMobileOpen(false)
   }, [location.pathname])
 
-  const isActive = (path: string) => location.pathname === path
+  const isCollections =
+    location.pathname.startsWith('/categoria') || location.pathname === '/categorias'
 
   return (
-    <header
-      className={`sticky top-0 z-50 bg-white transition-shadow duration-300 ${
-        scrolled ? 'shadow-[0_1px_12px_rgba(0,0,0,0.07)]' : 'border-b border-border'
-      }`}
-    >
-      <div className="container-custom">
-        <div className="flex items-center justify-between h-16 md:h-[70px]">
+    <header className="sticky top-0 w-full z-50 bg-[#f8f9fa]/80 backdrop-blur-md shadow-[0px_20px_40px_rgba(0,11,58,0.06)]">
+      <div className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
 
-          {/* ── Left Nav (desktop) ── */}
-          <nav className="hidden lg:flex items-center gap-7">
-            <Link
-              to="/"
-              className={`text-[13px] font-medium tracking-wide transition-colors ${
-                isActive('/') ? 'text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              INÍCIO
-            </Link>
+        {/* Logo */}
+        <Link
+          to="/"
+          className="text-2xl font-extrabold tracking-tighter text-[#00113a] font-headline"
+        >
+          ZaiWear
+        </Link>
 
-            {/* Shop dropdown */}
-            <div className="relative" onMouseLeave={() => setShopOpen(false)}>
-              <button
-                onMouseEnter={() => setShopOpen(true)}
-                className={`flex items-center gap-1 text-[13px] font-medium tracking-wide transition-colors ${
-                  location.pathname.startsWith('/categoria') || location.pathname === '/categorias'
-                    ? 'text-foreground font-semibold'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                LOJA
-                <ChevronDown
-                  size={13}
-                  className={`transition-transform duration-200 ${shopOpen ? 'rotate-180' : ''}`}
-                />
-              </button>
-
-              {shopOpen && (
-                <div className="absolute top-full left-0 mt-2 w-52 bg-white border border-border rounded-xl shadow-lg py-2 animate-fade-in">
-                  <Link
-                    to="/categorias"
-                    className="flex items-center px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                  >
-                    Todas as Categorias
-                  </Link>
-                  <hr className="my-1 border-border" />
-                  {categories.map(cat => (
-                    <Link
-                      key={cat.id}
-                      to={`/categoria/${cat.slug}`}
-                      className="flex items-center px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                    >
-                      {cat.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          </nav>
-
-          {/* ── Logo (center) ── */}
+        {/* Desktop nav */}
+        <nav className="hidden md:flex items-center gap-8 font-headline font-medium tracking-tight">
           <Link
             to="/"
-            className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 shrink-0"
+            className={`transition-colors duration-300 ${
+              location.pathname === '/'
+                ? 'text-[#00113a] font-bold'
+                : 'text-[#00113a]/60 hover:text-[#00113a]'
+            }`}
           >
-            <span className="font-display text-[1.6rem] font-bold tracking-tight text-foreground">
-              Zai<span style={{ color: 'var(--color-accent)' }}>Wear</span>
-            </span>
+            Início
           </Link>
 
-          {/* ── Right Actions ── */}
-          <div className="flex items-center gap-1">
-            {/* Search (placeholder) */}
+          {/* Collections dropdown */}
+          <div className="relative" onMouseEnter={() => setShopOpen(true)} onMouseLeave={() => setShopOpen(false)}>
             <button
-              className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-              aria-label="Buscar"
+              className={`transition-colors duration-300 pb-4 ${
+                isCollections
+                  ? 'text-[#a43c12] font-bold border-b-2 border-[#a43c12]'
+                  : 'text-[#00113a]/60 hover:text-[#00113a]'
+              }`}
             >
-              <Search size={18} />
+              Coleções
             </button>
 
-            {/* Cart */}
-            <button
-              onClick={openCart}
-              className="relative hidden sm:flex items-center gap-2 border border-border hover:border-foreground text-foreground px-4 py-2 rounded-full text-[13px] font-semibold transition-all duration-200 ml-1"
-              aria-label="Carrinho"
-            >
-              <ShoppingBag size={15} />
-              MEU CARRINHO
-              {cartCount > 0 && (
-                <span
-                  className="flex items-center justify-center w-5 h-5 rounded-full text-white text-[10px] font-bold"
-                  style={{ backgroundColor: 'var(--color-primary)' }}
+            {shopOpen && (
+              <div className="absolute top-full left-0 w-56 bg-white border border-[#c5c6d2]/30 shadow-lg py-2 animate-fade-in">
+                <Link
+                  to="/categorias"
+                  className="flex items-center px-4 py-2.5 text-sm text-[#444650] hover:text-[#00113a] hover:bg-[#f3f4f5] transition-colors"
                 >
-                  {cartCount > 9 ? '9+' : cartCount}
-                </span>
-              )}
-            </button>
-
-            {/* Cart icon (mobile) */}
-            <button
-              onClick={openCart}
-              className="relative sm:hidden flex items-center justify-center w-9 h-9 rounded-full hover:bg-muted transition-colors"
-              aria-label="Carrinho"
-            >
-              <ShoppingBag size={18} />
-              {cartCount > 0 && (
-                <span
-                  className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-4.5 h-4.5 rounded-full text-white text-[9px] font-bold"
-                  style={{ backgroundColor: 'var(--color-primary)' }}
-                >
-                  {cartCount}
-                </span>
-              )}
-            </button>
-
-            {/* Mobile menu toggle */}
-            <button
-              onClick={() => setMobileOpen(v => !v)}
-              className="lg:hidden flex items-center justify-center w-9 h-9 rounded-full hover:bg-muted transition-colors"
-              aria-label="Menu"
-            >
-              {mobileOpen ? <X size={18} /> : <Menu size={18} />}
-            </button>
+                  Todas as Categorias
+                </Link>
+                <hr className="my-1 border-[#c5c6d2]/40" />
+                {categories.map(cat => (
+                  <Link
+                    key={cat.id}
+                    to={`/categoria/${cat.slug}`}
+                    className="flex items-center px-4 py-2.5 text-sm text-[#444650] hover:text-[#00113a] hover:bg-[#f3f4f5] transition-colors"
+                  >
+                    {cat.name}
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
+        </nav>
+
+        {/* Right actions */}
+        <div className="flex items-center gap-4">
+          {/* Cart */}
+          <button
+            onClick={openCart}
+            className="relative flex items-center justify-center active:scale-95 transition-transform duration-200"
+            aria-label="Carrinho"
+          >
+            <span className="material-symbols-outlined text-[#00113a]">shopping_bag</span>
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-[#a43c12] text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                {cartCount > 9 ? '9+' : cartCount}
+              </span>
+            )}
+          </button>
+
+          {/* Mobile toggle */}
+          <button
+            onClick={() => setMobileOpen(v => !v)}
+            className="md:hidden flex items-center justify-center active:scale-95 transition-transform"
+            aria-label="Menu"
+          >
+            <span className="material-symbols-outlined text-[#00113a]">
+              {mobileOpen ? 'close' : 'menu'}
+            </span>
+          </button>
         </div>
       </div>
 
-      {/* ── Mobile Menu ── */}
+      {/* Mobile menu */}
       {mobileOpen && (
-        <div className="lg:hidden border-t border-border bg-white animate-fade-in">
-          <div className="container-custom py-4 flex flex-col gap-0.5">
+        <div className="md:hidden border-t border-[#c5c6d2]/30 bg-[#f8f9fa] animate-fade-in">
+          <div className="flex flex-col px-6 py-4 gap-0.5">
             <Link
               to="/"
-              className="py-3 px-3 text-sm font-medium rounded-lg hover:bg-muted transition-colors"
+              className="py-3 text-sm font-headline text-[#00113a]/60 hover:text-[#00113a] transition-colors"
             >
               Início
             </Link>
             <Link
               to="/categorias"
-              className="py-3 px-3 text-sm font-semibold rounded-lg hover:bg-muted transition-colors"
-              style={{ color: 'var(--color-accent)' }}
+              className="py-3 text-sm font-headline font-bold text-[#a43c12]"
             >
               Todas as Categorias
             </Link>
@@ -175,7 +128,7 @@ export function Header() {
               <Link
                 key={cat.id}
                 to={`/categoria/${cat.slug}`}
-                className="py-2.5 px-3 text-sm text-muted-foreground font-medium rounded-lg hover:bg-muted hover:text-foreground transition-colors pl-6"
+                className="py-2.5 pl-4 text-sm text-[#444650] hover:text-[#00113a] transition-colors"
               >
                 {cat.name}
               </Link>
