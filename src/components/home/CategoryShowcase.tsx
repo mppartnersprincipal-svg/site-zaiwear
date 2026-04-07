@@ -1,13 +1,30 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useCategories } from '@/hooks/useCategories'
 
-const PLACEHOLDER_IMAGES = [
-  'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&q=80&fit=crop',
-  'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&q=80&fit=crop',
-  'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=600&q=80&fit=crop',
-  'https://images.unsplash.com/photo-1603808033192-082d6919d3e1?w=600&q=80&fit=crop',
-  'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80&fit=crop',
-]
+function CategoryImage({ src, alt }: { src: string | null; alt: string }) {
+  const [failed, setFailed] = useState(false)
+
+  if (!src || failed) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-[#edeeef]">
+        <span className="material-symbols-outlined text-[#444650]/20" style={{ fontSize: '3rem' }}>
+          checkroom
+        </span>
+        <span className="text-[11px] text-[#444650]/40 font-body uppercase tracking-widest">{alt}</span>
+      </div>
+    )
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      onError={() => setFailed(true)}
+    />
+  )
+}
 
 export function CategoryShowcase() {
   const { data: categories = [], isLoading } = useCategories()
@@ -55,11 +72,7 @@ export function CategoryShowcase() {
                 style={{ animationDelay: `${i * 60}ms` }}
               >
                 <div className="aspect-square bg-[#edeeef] overflow-hidden mb-4">
-                  <img
-                    src={cat.image ?? PLACEHOLDER_IMAGES[i % PLACEHOLDER_IMAGES.length]}
-                    alt={cat.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+                  <CategoryImage src={cat.image ?? null} alt={cat.name} />
                 </div>
                 <h3 className="font-headline font-bold text-[#00113a] tracking-tight">
                   {cat.name}

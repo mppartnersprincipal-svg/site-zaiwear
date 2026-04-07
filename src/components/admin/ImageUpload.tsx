@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Upload, X, Loader2 } from 'lucide-react'
+import { Upload, X, Loader2, AlertCircle, RefreshCw } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 
 interface Props {
@@ -8,10 +8,29 @@ interface Props {
   folder?: string
 }
 
+const UPLOAD_TIMEOUT_MS = 15000
+
+const ERROR_MESSAGES: Record<string, string> = {
+  'The resource was not found': 'Bucket "product-images" não encontrado. Crie-o no painel do Supabase (Storage > Buckets).',
+  'new row violates row-level security policy': 'Sem permissão para upload. Verifique as políticas de storage no Supabase.',
+  'Unauthorized': 'Sessão expirada. Faça login novamente.',
+  'Invalid JWT': 'Sessão inválida. Faça login novamente.',
+  'exceeded the maximum allowed size': 'Arquivo muito grande. Máximo permitido: 5MB.',
+  'duplicate': 'Já existe um arquivo com esse nome. Tente novamente.',
+}
+
+function friendlyError(message: string): string {
+  for (const [key, friendly] of Object.entries(ERROR_MESSAGES)) {
+    if (message.toLowerCase().includes(key.toLowerCase())) return friendly
+  }
+  return `Erro ao fazer upload: ${message}`
+}
+
 export function ImageUpload({ value, onChange, folder = 'products' }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
+  const [lastFile, setLastFile] = useState<File | null>(null)
 
   async function handleFile(file: File) {
     if (!file.type.startsWith('image/')) {
@@ -25,23 +44,45 @@ export function ImageUpload({ value, onChange, folder = 'products' }: Props) {
 
     setError('')
     setUploading(true)
+    setLastFile(file)
 
     const ext = file.name.split('.').pop()
     const filename = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 
-    const { error: uploadErr } = await supabase.storage
-      .from('product-images')
-      .upload(filename, file, { cacheControl: '3600', upsert: false })
+    try {
+      const uploadPromise = supabase.storage
+        .from('product-images')
+        .upload(filename, file, { cacheControl: '3600', upsert: false })
 
-    if (uploadErr) {
-      setError('Erro ao fazer upload: ' + uploadErr.message)
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('timeout')), UPLOAD_TIMEOUT_MS)
+      )
+
+      const { error: uploadErr } = await Promise.race([uploadPromise, timeoutPromise])
+
+      if (uploadErr) {
+        setError(friendlyError(uploadErr.message))
+        setUploading(false)
+        return
+      }
+
+      const { data } = supabase.storage.from('product-images').getPublicUrl(filename)
+      onChange(data.publicUrl)
+      setLastFile(null)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      if (message === 'timeout') {
+        setError('Upload demorou demais. Verifique sua conexão e tente novamente.')
+      } else {
+        setError(friendlyError(message))
+      }
+    } finally {
       setUploading(false)
-      return
     }
+  }
 
-    const { data } = supabase.storage.from('product-images').getPublicUrl(filename)
-    onChange(data.publicUrl)
-    setUploading(false)
+  function handleRetry() {
+    if (lastFile) handleFile(lastFile)
   }
 
   async function handleRemove() {
@@ -77,10 +118,13 @@ export function ImageUpload({ value, onChange, folder = 'products' }: Props) {
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          className="flex flex-col items-center justify-center gap-3 aspect-square rounded-xl border-2 border-dashed border-border hover:border-primary hover:bg-muted/50 transition-colors"
+          className="flex flex-col items-center justify-center gap-3 aspect-square rounded-xl border-2 border-dashed border-border hover:border-primary hover:bg-muted/50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {uploading ? (
-            <Loader2 size={24} className="animate-spin text-muted-foreground" />
+            <>
+              <Loader2 size={24} className="animate-spin text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">Enviando...</span>
+            </>
           ) : (
             <>
               <Upload size={24} className="text-muted-foreground" />
@@ -92,7 +136,22 @@ export function ImageUpload({ value, onChange, folder = 'products' }: Props) {
         </button>
       )}
 
-      {error && <p className="text-xs text-destructive">{error}</p>}
+      {error && (
+        <div className="flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2">
+          <AlertCircle size={14} className="mt-0.5 shrink-0 text-destructive" />
+          <p className="flex-1 text-xs text-destructive">{error}</p>
+          {lastFile && (
+            <button
+              type="button"
+              onClick={handleRetry}
+              className="flex items-center gap-1 text-xs font-medium text-destructive underline-offset-2 hover:underline shrink-0"
+            >
+              <RefreshCw size={11} />
+              Tentar novamente
+            </button>
+          )}
+        </div>
+      )}
 
       <input
         ref={inputRef}
