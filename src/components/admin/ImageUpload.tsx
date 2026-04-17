@@ -8,7 +8,7 @@ interface Props {
   folder?: string
 }
 
-const UPLOAD_TIMEOUT_MS = 15000
+const UPLOAD_TIMEOUT_MS = 60000
 
 const ERROR_MESSAGES: Record<string, string> = {
   'The resource was not found': 'Bucket "product-images" não encontrado. Crie-o no painel do Supabase (Storage > Buckets).',
@@ -46,6 +46,16 @@ export function ImageUpload({ value, onChange, folder = 'products' }: Props) {
     setUploading(true)
     setLastFile(file)
 
+    const { data: { session } } = await supabase.auth.getSession()
+    console.log('[ImageUpload] session uid:', session?.user?.id ?? 'NULL - não autenticado')
+    console.log('[ImageUpload] token expires:', session?.expires_at ? new Date(session.expires_at * 1000).toISOString() : 'N/A')
+
+    if (!session) {
+      setError('Sessão expirada. Faça login novamente.')
+      setUploading(false)
+      return
+    }
+
     const ext = file.name.split('.').pop()
     const filename = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 
@@ -61,6 +71,7 @@ export function ImageUpload({ value, onChange, folder = 'products' }: Props) {
       const { error: uploadErr } = await Promise.race([uploadPromise, timeoutPromise])
 
       if (uploadErr) {
+        console.error('[ImageUpload] Supabase error:', uploadErr)
         setError(friendlyError(uploadErr.message))
         setUploading(false)
         return
@@ -71,6 +82,7 @@ export function ImageUpload({ value, onChange, folder = 'products' }: Props) {
       setLastFile(null)
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err)
+      console.error('[ImageUpload] catch error:', message)
       if (message === 'timeout') {
         setError('Upload demorou demais. Verifique sua conexão e tente novamente.')
       } else {

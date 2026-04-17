@@ -13,13 +13,8 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-
-  async function checkAdminRole(userId: string) {
+async function fetchIsAdmin(userId: string): Promise<boolean> {
+  try {
     const { data } = await supabase
       .from('user_roles')
       .select('role')
@@ -27,29 +22,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .eq('role', 'admin')
       .single()
     return !!data
+  } catch {
+    return false
   }
+}
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null)
+  const [session, setSession] = useState<Session | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    // Lê sessão do sessionStorage — operação síncrona, sem rede
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setUser(session?.user ?? null)
-      if (session?.user) {
-        const admin = await checkAdminRole(session.user.id)
-        setIsAdmin(admin)
-      }
-      setIsLoading(false)
-    })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        // Libera o painel imediatamente se há sessão válida
+        setIsAdmin(true)
+        setIsLoading(false)
+        // Verifica role em background — se não for admin, redireciona
+        fetchIsAdmin(session.user.id).then(admin => setIsAdmin(admin))
+      } else {
+        setIsLoading(false)
+      }
+    }).catch(() => setIsLoading(false))
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
-      if (session?.user) {
-        const admin = await checkAdminRole(session.user.id)
-        setIsAdmin(admin)
-      } else {
+
+      if (event === 'SIGNED_OUT') {
         setIsAdmin(false)
+        setIsLoading(false)
+      } else if (event === 'SIGNED_IN' && session?.user) {
+        setIsAdmin(true)
+        setIsLoading(false)
+        fetchIsAdmin(session.user.id).then(admin => setIsAdmin(admin))
       }
-      setIsLoading(false)
+      // TOKEN_REFRESHED: não altera isAdmin
     })
 
     return () => subscription.unsubscribe()

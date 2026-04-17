@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -37,6 +37,8 @@ export default function AdminProductForm() {
   const createMutation = useCreateProduct()
   const updateMutation = useUpdateProduct()
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
+  const formInitialized = useRef(false)
 
   const { register, handleSubmit, control, setValue, watch, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -57,7 +59,8 @@ export default function AdminProductForm() {
   const imageValue = watch('image')
 
   useEffect(() => {
-    if (product && isEditing) {
+    if (product && isEditing && !formInitialized.current) {
+      formInitialized.current = true
       setValue('name', product.name)
       setValue('description', product.description ?? '')
       setValue('category_id', product.category_id)
@@ -74,6 +77,7 @@ export default function AdminProductForm() {
 
   async function onSubmit(data: FormData) {
     setSaving(true)
+    setSaveError('')
     try {
       if (isEditing && id) {
         await updateMutation.mutateAsync({
@@ -100,6 +104,7 @@ export default function AdminProductForm() {
       navigate('/admin/produtos')
     } catch (err) {
       console.error(err)
+      setSaveError(err instanceof Error ? err.message : 'Erro ao salvar. Tente novamente.')
     } finally {
       setSaving(false)
     }
@@ -276,6 +281,9 @@ export default function AdminProductForm() {
             </div>
 
             <div className="bg-white rounded-2xl border border-border p-6 flex flex-col gap-3">
+              {saveError && (
+                <p className="text-xs text-destructive bg-destructive/10 border border-destructive/30 rounded-lg px-3 py-2">{saveError}</p>
+              )}
               <button
                 type="submit"
                 disabled={saving}

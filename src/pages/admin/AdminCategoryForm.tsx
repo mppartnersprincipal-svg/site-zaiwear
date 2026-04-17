@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -25,6 +25,7 @@ export default function AdminCategoryForm() {
   const createMutation = useCreateCategory()
   const updateMutation = useUpdateCategory()
   const [saving, setSaving] = useState(false)
+  const formInitialized = useRef(false)
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -41,7 +42,8 @@ export default function AdminCategoryForm() {
   }, [nameValue, isEditing, setValue])
 
   useEffect(() => {
-    if (category && isEditing) {
+    if (category && isEditing && !formInitialized.current) {
+      formInitialized.current = true
       setValue('name', category.name)
       setValue('slug', category.slug)
       setValue('description', category.description ?? '')
